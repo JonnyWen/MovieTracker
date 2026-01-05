@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import {fetchMovies } from "../api/tmdb";
+import {fetchMovies, searchAllMovies } from "../api/tmdb";
 import { MovieCard } from "../components/moviecard";
 
 type Movie = {
@@ -14,7 +14,6 @@ type Movie = {
 
 export const Home: React.FC = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
-    const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -23,63 +22,38 @@ export const Home: React.FC = () => {
     const [totalPages, setTotalPages] = useState<number>(1);
 
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [searchInput, setSearchInput] = useState("");
 
+    // Create a slight delay effect (debounce)
+    useEffect(() => {
+        const t = setTimeout(() => {
+          setSearchQuery(searchInput.trim());
+        }, 400);
+      
+        return () => clearTimeout(t);
+      }, [searchInput]);
 
     useEffect(() => {
-        fetchMoviesData()
-    }, [page, sortBy]);
-
-    
-    // allows run whenever sortBy / movies states changes value (dependencies)
-    useEffect(() => {
-        const filterMovies = () => {
-            let filtered = movies.filter(
-                (movie) => 
-                    movie.title.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            // tmdb already sorts for us
-            // filtered.sort((a, b) => { // a compare b < 0 ? [a, b] : [b, a]
-            //     switch (sortBy) {
-            //         case "title":
-            //           return a.title.localeCompare(b.title);
-            //         case "rating":
-            //           return a.vote_average - b.vote_average;
-            //         case "rating_desc":
-            //           return b.vote_average - a.vote_average;
-            //         case "release_date":
-            //           return (
-            //             new Date(b.release_date).getTime() -
-            //             new Date(a.release_date).getTime()
-            //           );
-            //         default:
-            //           return b.popularity - a.popularity;
-            //       }
-            //     }
-            // );
-    
-            setFilteredMovies(filtered);
+        const fetchMoviesData = async () => {
+            try {
+                const data = searchQuery ? await searchAllMovies(searchQuery, page) : await fetchMovies(page, sortBy);
+                setMovies(data.results); 
+                setTotalPages(Math.min(data.total_pages, 500));
+            } catch (err) {
+                console.error("Error fetching movies: ", err);
+            } finally { // no matter try is success or failure
+                setIsLoading(false);
+            }
         };
 
-        filterMovies();
-        
-    }, [movies, sortBy, searchQuery]);
+        fetchMoviesData()
+    }, [page, sortBy, searchQuery]);
 
     useEffect(() => {
         setPage(1);
-      }, [sortBy]);
-      
-    const fetchMoviesData = async () => {
-        try {
-            const data = await fetchMovies(page, sortBy);
-            setMovies(data.results); 
-            setTotalPages(data.total_pages);
-        } catch (err) {
-            console.error("Error fetching movies: ", err);
-        } finally { // no matter try is success or failure
-            setIsLoading(false);
-        }
-    };
+      }, [sortBy, searchQuery]);
 
+    // implement sorting for when query is not empty
 
     return (
         <div className="min-h-screen bg-slate-950 text-white">
@@ -99,7 +73,7 @@ export const Home: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Search movies..."
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => setSearchInput(e.target.value)}
                   className="w-full rounded-lg bg-slate-800 px-4 py-2 text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
@@ -135,7 +109,7 @@ export const Home: React.FC = () => {
             <div
               className="mx-auto max-w-7xl px-6 pb-16 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
             >
-              {filteredMovies.map((movie, key) => (
+              {movies.map((movie, key) => (
                 <MovieCard movie={movie} key={movie.id}  />
               ))}
             </div>

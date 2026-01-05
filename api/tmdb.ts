@@ -21,3 +21,21 @@ export const fetchMovies = async (
 
     return response.json();
 };
+
+export const searchAllMovies = async (
+    query: string,
+    page: number,
+  ) => {
+      const response = await fetch(
+          `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&sort_by=${sortBy}&query=${encodeURIComponent(
+            query
+          )}&page=${page}`
+      );
+      
+      if (!response.ok) {
+          throw new Error("Failed fetch");
+  
+      }
+  
+      return response.json();
+  };

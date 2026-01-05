@@ -22,7 +22,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({
   return (
     <Link to={`/movie/${movie.id}`} className="block">
       <div
-        className="group rounded-xl bg-slate-900 border border-slate-800 overflow-hidden transition hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40"
+        className="group rounded-xl bg-slate-900 border border-slate-800 overflow-hidden transition hover:-translate-y-1 hover:shadow-xl "
       >
         {/* Poster wrapper */}
         <div
@@ -42,10 +42,10 @@ export const MovieCard: React.FC<MovieCardProps> = ({
 
         {/* Info */}
         <div
-          className="flex flex-col justify-between p-4"
+          className="flex flex-col justify-between p-4 overflow-hidden"
         >
           <div>
-            <h3 className="text-sm font-semibold leading-tight line-clamp-2 group-hover:text-indigo-400">
+            <h3 className="text-sm font-semibold leading-tight line-clamp-1 group-hover:text-indigo-400">
               {movie.title}
             </h3>
 
