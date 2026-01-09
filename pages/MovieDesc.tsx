@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { fetchMovie, fetchMovieCredits } from "../api/tmdb";
+import { useLikedMovies } from "../context/LikedMoviesContext";
+
 
 export const BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w1280"
 export const POSTER_BASE_URL = "https://image.tmdb.org/t/p/w342";
@@ -41,6 +43,9 @@ export const MovieDesc: React.FC = () => {
       setIsLoading(false);
     }
   }
+
+  const { toggleLike, isLiked } = useLikedMovies();
+  const liked = movie ? isLiked(movie.id) : false;
 
   // loading movies
   if (isLoading) {
@@ -93,20 +98,20 @@ export const MovieDesc: React.FC = () => {
 
   const director = credits.crew.filter(
     person => person.job === "Director"
-  );  
+  );
 
   return (
     <div>
       <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-white/10">
-        <div 
+        <div
           className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between"
           onClick={() => navigate("/")}
         >
           <h1 className="text-xl font-bold text-white">
-            🎬 MovieTracker 
+            🎬 MovieTracker
           </h1>
           <p className="text-sm text-slate-400">
-              Discover trending and popular movies
+            Discover trending and popular movies
           </p>
         </div>
       </header>
@@ -120,14 +125,20 @@ export const MovieDesc: React.FC = () => {
 
         <div className="relative z-10 max-w-7xl mx-auto h-full flex items-end px-6 pb-12">
           <div className="flex gap-8">
+
+
             <img
               src={`${POSTER_BASE_URL}${movie.poster_path}`}
               alt={movie.title}
               className="w-48 rounded-xl shadow-lg"
             />
+            
 
             <div className="text-white max-w-xl">
-              <h1 className="text-4xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{movie.title}</h1>
+              <h1 className="text-4xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                {movie.title}
+              </h1>
+
               <p className="mt-2 text-slate-300 italic drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 {movie.tagline}
               </p>
@@ -137,6 +148,25 @@ export const MovieDesc: React.FC = () => {
                 <span>{movie.runtime} min</span>
                 <span>{movie.release_date.slice(0, 4)}</span>
               </div>
+
+              <button
+              onClick={(e) => {
+                e.preventDefault(); // prevent navigation to movie.id
+                e.stopPropagation(); // prevent click from reaching parent 
+                toggleLike(movie);
+              }}
+              className="
+              absolute mt-4
+              px-4 py-2 rounded-lg text-sm font-medium
+              bg-slate-800  text-slate-300
+              hover:bg-slate-700
+              active:scale-95
+              transition
+              disabled:opacity-50 disabled:cursor-not-allowed
+              "
+            >
+            {liked ? "Liked ❤️" : "Like Movie 🤍"}
+            </button>
             </div>
           </div>
         </div>
@@ -158,10 +188,10 @@ export const MovieDesc: React.FC = () => {
 
           <div className="flex gap-4 overflow-x-auto pb-4">
             {credits.cast.map(actor => (
-              <div 
+              <div
                 key={actor.id}
                 className="w-32 shrink-0 text-center"
-              > 
+              >
                 <img
                   src={
                     actor.profile_path
@@ -188,11 +218,11 @@ export const MovieDesc: React.FC = () => {
           </h2>
 
           <div className="flex gap-4 overflow-x-auto pb-4">
-            {director.length > 0 && ( director.map(director => (
-              <div 
+            {director.length > 0 && (director.map(director => (
+              <div
                 key={director.id}
                 className="w-32 shrink-0 text-center"
-              > 
+              >
                 <img
                   src={
                     director.profile_path
@@ -208,7 +238,7 @@ export const MovieDesc: React.FC = () => {
               </div>
             )))}
           </div>
-          
+
         </div>
 
 

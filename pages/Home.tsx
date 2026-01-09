@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { fetchMovies, fetchNowPlaying, searchAllMovies } from "../api/tmdb";
 import { MovieCard } from "../components/moviecard";
+import { useNavigate } from "react-router";
 
 type Movie = {
   id: number;
@@ -14,6 +15,7 @@ type Movie = {
 
 export const Home: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -29,8 +31,7 @@ export const Home: React.FC = () => {
     | "now_playing";
 
   const [browseMode, setBrowseMode] = useState<BrowseMode>("discover");
-
-
+  
   // Create a slight delay effect (debounce)
   useEffect(() => {
     const t = setTimeout(() => {
@@ -66,8 +67,6 @@ export const Home: React.FC = () => {
     setPage(1);
   }, [sortBy, browseMode, searchQuery]);
 
-  // implement sorting for when query is not empty
-
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* HEADER */}
@@ -80,6 +79,20 @@ export const Home: React.FC = () => {
               Discover trending and popular movies
             </p>
           </div>
+
+          <button
+            onClick={() => navigate("/likedmovies")} 
+            className="
+              px-4 py-2 rounded-lg text-sm font-medium
+              bg-slate-800 text-white
+              hover:bg-slate-700
+              active:scale-95
+              transition
+              disabled:opacity-50 disabled:cursor-not-allowed
+              "
+            >
+            My Liked Movies
+          </button>
 
           {/* Search */}
           <div className="w-full md:w-72">
@@ -145,10 +158,6 @@ export const Home: React.FC = () => {
           </div>
         ))}
 
-
-
-
-
       {/* CONTENT */}
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-24 text-slate-400">
@@ -163,8 +172,8 @@ export const Home: React.FC = () => {
             <MovieCard movie={movie} key={movie.id} />
           ))}
         </div>
-      )
-      }
+        
+      )}
 
       {/* Page */}
       <div className="flex gap-2 justify-center mb-6">
@@ -214,6 +223,6 @@ export const Home: React.FC = () => {
       <footer className="border-t border-slate-800 bg-slate-900 py-6 text-center text-sm text-slate-400">
         Data provided by TMDB
       </footer>
-    </div >
+    </div>
   );
 };

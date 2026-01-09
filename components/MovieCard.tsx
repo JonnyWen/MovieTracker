@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { useLikedMovies } from "../context/LikedMoviesContext";
 
 type Movie = {
   id: number;
@@ -9,35 +10,52 @@ type Movie = {
   popularity: number;
 };
 
-type MovieCardProps = {
+interface MovieCardProps {
   movie: Movie;
-  viewMode?: "grid" | "list";
-};
+}
 
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
 export const MovieCard: React.FC<MovieCardProps> = ({
   movie,
 }) => {
+
+  const { toggleLike, isLiked } = useLikedMovies();
+
+  const liked = isLiked(movie.id);
+
   return (
     <Link to={`/movie/${movie.id}`} className="block">
       <div
-        className="group rounded-xl bg-slate-900 border border-slate-800 overflow-hidden transition hover:-translate-y-1 hover:shadow-xl "
+        className="relative group rounded-xl bg-slate-900 border border-slate-800 transition hover:-translate-y-1 hover:shadow-xl "
       >
+
         {/* Poster wrapper */}
         <div
-        className="overflow-hidden rounded-lg bg-slate-800 aspect-2/3 w-full"       
+          className="relative overflow-hidden group rounded-xl bg-slate-800 aspect-2/3 w-full"
         >
-            {/* Poster */}
-            <img
+          
+          <button
+            onClick={(e) => {
+              e.preventDefault(); // prevent navigation to movie.id
+              e.stopPropagation(); // prevent click from reaching parent 
+              toggleLike(movie);
+            }}
+            className="absolute top-2 right-2 z-50 text-2xl drop-shadow-lg"    
+          >
+            {liked ? "❤️" : "🤍"}
+          </button>
+
+          {/* Poster */}
+          <img
             src={
-                movie.poster_path
+              movie.poster_path
                 ? `${IMAGE_BASE_URL}${movie.poster_path}`
                 : "../assets/placeholder_poster.jpg" // does not work
             }
             alt={movie.title}
             className="rounded-lg object-cover bg-slate-800 h-72 w-full"
-            />
+          />
         </div>
 
         {/* Info */}
@@ -62,6 +80,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({
             <span className="text-slate-500">
               Popularity: {Math.round(movie.popularity)}
             </span>
+
           </div>
         </div>
       </div>
