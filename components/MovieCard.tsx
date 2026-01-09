@@ -33,7 +33,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({
             src={
                 movie.poster_path
                 ? `${IMAGE_BASE_URL}${movie.poster_path}`
-                : "/placeholder.png"
+                : "../assets/placeholder_poster.jpg" // does not work
             }
             alt={movie.title}
             className="rounded-lg object-cover bg-slate-800 h-72 w-full"
