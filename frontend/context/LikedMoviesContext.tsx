@@ -40,13 +40,6 @@ export const LikedMoviesProvider = ({ children }: { children: React.ReactNode })
     const isLiked = (id: number) =>
         likedMovies.some(m => m.id === id)
 
-    // useEffect(() => { 
-    //     const saved = localStorage.getItem("likedMovies"); 
-    //     if (saved) setLikedMovies(JSON.parse(saved)); }, []); 
-
-    // useEffect(() => { 
-    //     localStorage.setItem("likedMovies", JSON.stringify(likedMovies)); }, [likedMovies]);
-
     return (
         <LikedMoviesContext.Provider value={{ likedMovies, toggleLike, isLiked }}>
             {children}

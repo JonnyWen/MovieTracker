@@ -1,5 +1,5 @@
 const API_KEY = "766ef3297abeedbed3afeef5daa2e181";
-
+//const API_KEY = import.meta.env.TMDB_API_KEY;
 export const fetchMovies = async (
   page: number,
   sortBy: string,

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router"
 import { useLikedMovies } from "../context/LikedMoviesContext";
 import { MovieCard } from "../components/moviecard";
@@ -5,6 +6,46 @@ import { MovieCard } from "../components/moviecard";
 export const LikedMovies: React.FC = () => {
     const { likedMovies } = useLikedMovies();
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+
+    type Recommendation = {
+        title: string;
+        reason: string;
+    }
+
+    const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+
+    // call from backend, which communicates with OpenAI API
+    const getRecommendations = async () => {
+        try {
+            setIsLoading(true);
+            const response = await fetch("http://localhost:3001/api/recommend", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    likedMovies: likedMovies.map(m => m.title),
+                }),
+            });
+
+            const data = await response.json();
+            console.log(data.recommendations);
+            setRecommendations(data.recommendations);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (isLoading) {
+        return (
+          <div className="flex flex-col items-center justify-center py-24 text-slate-400">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
+            <p className="mt-4">Loading movies...</p>
+          </div>
+        );
+      };
+
 
     if (likedMovies.length === 0) {
         return (
@@ -39,7 +80,7 @@ export const LikedMovies: React.FC = () => {
                     <div onClick={() => navigate("/")}>
                         <h1 className="text-2xl font-bold">My List</h1>
                         <p className="text-sm text-slate-400">
-                        🎬 MovieTracker
+                            🎬 MovieTracker
                         </p>
                     </div>
                 </div>
@@ -50,6 +91,21 @@ export const LikedMovies: React.FC = () => {
             >
                 {likedMovies.map((movie, key) => (
                     <MovieCard movie={movie} key={movie.id} />
+                ))}
+            </div>
+            <button
+                onClick={getRecommendations}
+                disabled={isLoading}
+            >
+                {isLoading ? "Thinking…" : "Get Recommendations"}
+            </button>
+            <div
+                className="mx-auto max-w-7xl grid p-5 grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+            >
+                {recommendations.map((rec, idx) => (
+                    <div key={idx}>
+                        <strong>{rec.title}</strong> – {rec.reason}
+                    </div>
                 ))}
             </div>
         </div>
