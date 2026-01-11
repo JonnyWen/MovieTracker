@@ -8,12 +8,16 @@ export const LikedMovies: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
-    type Recommendation = {
+    type Movie = {
+        id: number;
         title: string;
-        reason: string;
-    }
+        poster_path: string | null;
+        release_date: string;
+        vote_average: number;
+        popularity: number;
+    };
 
-    const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+    const [recommendations, setRecommendations] = useState<Movie[]>([]);
 
     // call from backend, which communicates with OpenAI API
     const getRecommendations = async () => {
@@ -28,8 +32,8 @@ export const LikedMovies: React.FC = () => {
             });
 
             const data = await response.json();
-            console.log(data.recommendations);
-            setRecommendations(data.recommendations);
+            console.log(data.movies);
+            setRecommendations(data.movies);
         } catch (err) {
             console.error(err);
         } finally {
@@ -37,14 +41,14 @@ export const LikedMovies: React.FC = () => {
         }
     };
 
-    if (isLoading) {
-        return (
-          <div className="flex flex-col items-center justify-center py-24 text-slate-400">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
-            <p className="mt-4">Loading movies...</p>
-          </div>
-        );
-      };
+    // if (isLoading) {
+    //     return (
+    //         <div className="flex flex-col items-center justify-center py-24 text-slate-400">
+    //             <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
+    //             <p className="mt-4">Loading movies...</p>
+    //         </div>
+    //     );
+    // };
 
 
     if (likedMovies.length === 0) {
@@ -96,16 +100,23 @@ export const LikedMovies: React.FC = () => {
             <button
                 onClick={getRecommendations}
                 disabled={isLoading}
+                className="
+                    mx-auto flex
+                    px-4 py-2 rounded-lg text-sm font-medium
+                    bg-slate-800 text-white
+                    hover:bg-slate-700
+                    active:scale-95
+                    transition
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                "
             >
                 {isLoading ? "Thinking…" : "Get Recommendations"}
             </button>
             <div
                 className="mx-auto max-w-7xl grid p-5 grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
             >
-                {recommendations.map((rec, idx) => (
-                    <div key={idx}>
-                        <strong>{rec.title}</strong> – {rec.reason}
-                    </div>
+                {recommendations.map(movie => (
+                    <MovieCard key={movie.id} movie={movie} />
                 ))}
             </div>
         </div>

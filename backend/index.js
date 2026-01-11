@@ -13,6 +13,19 @@ app.use(cors());
 // auto parese incoming JSON request bodies
 app.use(express.json());
 
+const TMDB_API_KEY = "766ef3297abeedbed3afeef5daa2e181";
+
+const searchTMDB = async (title, year) => {
+    const query = encodeURIComponent(title);
+
+    const res = await fetch(
+        `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${query}&year=${year ?? ""}`
+    );
+
+    const data = await res.json();
+    return data.results?.[0] || null;
+}
+
 app.post("/api/recommend", async (req, res) => {
     try {
         const { likedMovies } = req.body;
@@ -35,7 +48,7 @@ app.post("/api/recommend", async (req, res) => {
 
             Return JSON only in this format: 
             [
-                { "title": "...", "reason": "..." }
+                { "title": "...", "year": "..." }
             ]
             Return ONLY valid JSON.
             Do not include explanations.
@@ -55,9 +68,18 @@ app.post("/api/recommend", async (req, res) => {
 
         const data = await ollamaRes.json();
 
-        res.json({
-            recommendations: JSON.parse(data.response),
-        });
+
+        const recommendations = JSON.parse(data.response);
+
+        const tmdbMovies = [];
+
+        for (const rec of recommendations) {
+            const movie = await searchTMDB(rec.title, rec.year);
+            if (movie) tmdbMovies.push(movie);
+        }
+
+        res.json({ movies: tmdbMovies });
+
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "LLaMA request failed" });
