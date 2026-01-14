@@ -1,73 +1,125 @@
-# React + TypeScript + Vite
+# 🎬 AI-Powered Movie Recommendation Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack movie discovery and recommendation platform that combines a modern React frontend, a Node.js backend, real-world movie data from TMDB, and an open-source LLaMA language model to deliver personalized recommendations.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Browse popular and trending movies with rich metadata
 
-## React Compiler
+- Like movies to build a personal preference profile
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Generate AI-powered movie recommendations based on liked movies
 
-## Expanding the ESLint configuration
+- Resolve AI-generated recommendations to real TMDB movies (no hallucinated data)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Clickable movie cards with detailed movie pages
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🧠 How Recommendations Work
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- User likes movies on the frontend
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Liked movie titles are sent to the backend
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- A locally hosted LLaMA model (via Ollama) infers user taste and suggests movie titles
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- The backend resolves each recommendation against the TMDB API
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Only valid, real movies are returned to the frontend and rendered as movie cards
+
+- AI is used for taste inference, not as a source of truth.
+
+## 🏗️ Tech Stack
+### Frontend
+
+- React + TypeScript
+
+- React Router
+
+- Tailwind CSS
+
+- Context API (global state)
+
+- TMDB REST API
+
+### Backend
+
+- Node.js + Express
+
+- Open-source LLaMA model via Ollama
+
+- TMDB REST API
+
+- Defensive parsing and validation for AI outputs
+
+## 🚀 Getting Started
+### Prerequisites
+
+- Node.js (v18+ recommended)
+
+- npm
+
+- Ollama installed and running
+
+- TMDB API key
+
+#### 1️⃣ Clone the repository
+git clone https://github.com/your-username/movie-site.git
+cd movie-site
+
+#### 2️⃣ Set up environment variables
+
+Create a .env file in backend/:
+
+TMDB_API_KEY=your_tmdb_api_key_here
+
+#### 3️⃣ Install dependencies
+npm install
+npm install --prefix frontend
+npm install --prefix backend
+
+#### 4️⃣ Start Ollama (LLaMA)
+ollama serve
+
+##### Ensure the model is available:
+
+ollama pull llama3
+
+#### 5️⃣ Run the app (frontend + backend)
+npm run dev
+
+Frontend: http://localhost:5173
+
+Backend: http://localhost:3001
+
+## 🛡️ Reliability & Design Choices
+
+- AI output is treated as untrusted input
+
+- Backend validates and resolves recommendations against TMDB
+
+- No hardcoded AI or database IDs
+
+- Stateless backend API
+
+- Vendor-agnostic AI design (can swap models easily)
+
+## 📸 Screenshots
+
+<img width="2932" height="1642" alt="image" src="https://github.com/user-attachments/assets/d06872bc-88d8-4ea9-b0c5-52ee7fdefbfb" />
+<img width="2708" height="1632" alt="image" src="https://github.com/user-attachments/assets/61c097a6-8279-416f-9e0b-486d003e08e7" />
+<img width="2686" height="1620" alt="image" src="https://github.com/user-attachments/assets/587ee235-b41f-4697-8c40-2868ff486a3b" />
+
+
+## 📌 Future Improvements
+
+- Recommendation explanations shown directly on movie cards
+
+- Caching recommendations for repeated liked lists
+
+- User authentication and profiles
+
+- Advanced filtering and genre-based recommendations
+
+- Deployment (Docker / Railway / Fly.io)
+
+- Persistent liked movies using local storage
