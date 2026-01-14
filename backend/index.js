@@ -1,10 +1,13 @@
 import express from "express";
 import cors from "cors"; // allows from cross origin calls
+import dotenv from "dotenv"; // allow for hidden API key
 
 // create server instance, obj rep entire backend API
 // express is node framework that allow for define
 // how to handle http protocols 
 // express app <- our own traffic controller
+
+dotenv.config();
 
 const app = express();
 // use cors, allow other websites (frontend)
@@ -13,7 +16,7 @@ app.use(cors());
 // auto parese incoming JSON request bodies
 app.use(express.json());
 
-const TMDB_API_KEY = "766ef3297abeedbed3afeef5daa2e181";
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
 const searchTMDB = async (title, year) => {
     const query = encodeURIComponent(title);
